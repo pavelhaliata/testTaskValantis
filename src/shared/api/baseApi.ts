@@ -1,41 +1,83 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react';
-import md5 from 'md5';
+import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
+import { uniqueItems, xAuthCreator } from '../helpers';
+import { ActionsRequest, Item, Response } from './types.ts';
+import { PAGE_SIZE } from '../constants';
 
-const VITE_API_BASE_URL = import.meta.env.VITE_API_URL
-const API_PASSWORD = import.meta.env.VITE_API_PASSWORD
-
-const password = 'Valantis';
-const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-const xAuth = md5(password + '_' + timestamp);
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_PASSWORD = import.meta.env.VITE_API_PASSWORD;
 
 export const baseApi = createApi({
-    reducerPath: 'goodsApi',
-    baseQuery: fetchBaseQuery({
-        baseUrl: 'https://api.valantis.store:41000/',
-        prepareHeaders: (headers) => {
-
-            headers.set('X-Auth', xAuth);
-            return headers;
+  reducerPath: 'baseApi',
+  tagTypes: ['Items'],
+  baseQuery: retry(
+    fetchBaseQuery({
+      baseUrl: API_BASE_URL,
+      prepareHeaders: (headers) => {
+        headers.set('X-Auth', xAuthCreator(API_PASSWORD));
+        return headers;
+      },
+    }),
+    { maxRetries: 3 },
+  ),
+  endpoints: (builder) => ({
+    getIds: builder.mutation<string[], Partial<number>>({
+      query: (offset = 1) => ({
+        method: 'POST',
+        url: '',
+        body: {
+          action: ActionsRequest.Get_ids,
+          params: {
+            offset,
+            limit: PAGE_SIZE,
+          },
         },
+      }),
+      transformResponse: (response: Response<string[]>) =>
+        Array.from(new Set(response.result)),
     }),
-    endpoints: (builder) => ({
-        getGoodsApi: builder.mutation<any, RequestParamType>({
-            query: (body: any) => ({
-                method: 'POST',
-                url: '',
-                body,
-            }),
-        }),
+    getItems: builder.mutation<Item[], { ids: string[] }>({
+      query: (params) => ({
+        method: 'POST',
+        url: '',
+        body: {
+          action: ActionsRequest.Get_items,
+          params,
+        },
+      }),
+      transformResponse: (response: Response<Item[]>) =>
+        uniqueItems(response.result),
     }),
+    getFields: builder.mutation<
+      Response<string | null[]>,
+      { field: string; offset: 3; limit: 5 }
+    >({
+      query: (params) => ({
+        method: 'POST',
+        url: '',
+        body: {
+          action: ActionsRequest.Get_fields,
+          params,
+        },
+      }),
+    }),
+    filter: builder.mutation<string[], { price: number }>({
+      query: (params) => ({
+        method: 'POST',
+        url: '',
+        body: {
+          action: ActionsRequest.Filter,
+          params,
+        },
+      }),
+      transformResponse: (response: Response<string[]>) =>
+        Array.from(new Set(response.result)),
+    }),
+  }),
 });
 
-export const {useGetGoodsApiMutation} = baseApi;
-
-// types
-type ActionType = "filter" | "get_ids" | "get_items" | "get_fields"
-
-type RequestParamType<T = {}> = {
-    "action": ActionType,
-    "params": T
-}
-
+export const {
+  useGetIdsMutation,
+  useGetItemsMutation,
+  useGetFieldsMutation,
+  useFilterMutation,
+} = baseApi;
