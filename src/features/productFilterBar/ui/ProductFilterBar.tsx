@@ -1,8 +1,12 @@
 import { Button, Input, Select, Space } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 
 type FilterBar = {
   isLoading: boolean;
-  options: { value: string; label: string }[];
+  options: {
+    value: string;
+    label: string;
+  }[];
   productValue: string;
   priceValue: string;
   getBrand: (brand: string) => void;
@@ -26,40 +30,58 @@ export const ProductFilterBar = ({
   setPriceValue,
 }: FilterBar) => {
   return (
-    <Space>
+    <Space align='center' wrap>
       <Select
         disabled={isLoading}
-        style={{ width: 180 }}
         options={options}
         onChange={(e) => getBrand(e)}
         placeholder='бренд'
+        style={{ width: 190 }}
       />
-      <Input
-        type='text'
-        value={productValue}
-        onChange={(e) => setProductValue(e.target.value)}
-        placeholder='продукт'
-      />
-      <Button
-        disabled={isLoading}
-        onClick={() => getProductName(productValue)}
-        type='primary'
-      >
-        Поиск по названию товара
-      </Button>
-      <Input
-        type='number'
-        value={priceValue}
-        onChange={(e) => setPriceValue(e.target.value)}
-        placeholder='цена'
-      />
-      <Button
-        disabled={isLoading}
-        onClick={() => getPrice(priceValue)}
-        type='primary'
-      >
-        Поиск по цене
-      </Button>
+      <Space.Compact>
+        <Input
+          type='text'
+          value={productValue}
+          onChange={(e) => setProductValue(e.target.value)}
+          placeholder='продукт'
+        />
+        <Button
+          block
+          disabled={isLoading}
+          onClick={() => getProductName(productValue)}
+          type='primary'
+          style={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          icon={<SearchOutlined />}
+        >
+          Поиск по названию
+        </Button>
+      </Space.Compact>
+      <Space.Compact>
+        <Input
+          type='number'
+          value={priceValue}
+          onChange={(e) => setPriceValue(e.target.value)}
+          placeholder='цена'
+        />
+        <Button
+          block
+          disabled={isLoading}
+          onClick={() => getPrice(priceValue)}
+          type='primary'
+          style={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+          }}
+          icon={<SearchOutlined />}
+        >
+          Поиск по цене
+        </Button>
+      </Space.Compact>
       {/*сбрасываем значение всех фильтров и делаем запрос за списком всех товаров*/}
       <Button
         disabled={isLoading}
