@@ -1,14 +1,19 @@
 import { createApi, fetchBaseQuery, retry } from '@reduxjs/toolkit/query/react';
 import { uniqueItems, xAuthCreator } from '../helpers';
-import { ActionsRequest, Item, Response } from './types.ts';
 import { PAGE_SIZE } from '../constants';
+import {
+  ActionsRequest,
+  FieldParam,
+  Filter,
+  Product,
+  Response,
+} from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_PASSWORD = import.meta.env.VITE_API_PASSWORD;
 
 export const baseApi = createApi({
   reducerPath: 'baseApi',
-  tagTypes: ['Items'],
   baseQuery: retry(
     fetchBaseQuery({
       baseUrl: API_BASE_URL,
@@ -19,23 +24,27 @@ export const baseApi = createApi({
     }),
     { maxRetries: 3 },
   ),
+  refetchOnReconnect: true,
+  // получение списка всех имеющиеся id
   endpoints: (builder) => ({
-    getIds: builder.mutation<string[], Partial<number>>({
-      query: (offset = 1) => ({
+    getIds: builder.mutation<string[], number>({
+      query: (offset) => ({
         method: 'POST',
         url: '',
         body: {
           action: ActionsRequest.Get_ids,
           params: {
             offset,
-            limit: PAGE_SIZE,
+            limit: PAGE_SIZE + 1, //на один товар больше,
           },
         },
       }),
-      transformResponse: (response: Response<string[]>) =>
-        Array.from(new Set(response.result)),
+      transformResponse: (response: Response) => {
+        return Array.from(new Set(response.result));
+      },
     }),
-    getItems: builder.mutation<Item[], { ids: string[] }>({
+    // получение списка товаров
+    getItems: builder.mutation<Product[], { ids: string[] }>({
       query: (params) => ({
         method: 'POST',
         url: '',
@@ -44,13 +53,11 @@ export const baseApi = createApi({
           params,
         },
       }),
-      transformResponse: (response: Response<Item[]>) =>
-        uniqueItems(response.result),
+      transformResponse: (response: Response<Product[]>) =>
+        uniqueItems(response.result), // проверка на дубли
     }),
-    getFields: builder.mutation<
-      Response<string | null[]>,
-      { field: string; offset: 3; limit: 5 }
-    >({
+    // получение полей товаров
+    getFields: builder.mutation<string[], { field: FieldParam }>({
       query: (params) => ({
         method: 'POST',
         url: '',
@@ -59,8 +66,11 @@ export const baseApi = createApi({
           params,
         },
       }),
+      transformResponse: (response: Response) =>
+        Array.from(new Set(response.result.filter((i) => i !== null))),
     }),
-    filter: builder.mutation<string[], { price: number }>({
+    // получение списка отфильтрованных id
+    filter: builder.mutation<string[], Filter>({
       query: (params) => ({
         method: 'POST',
         url: '',
@@ -69,7 +79,7 @@ export const baseApi = createApi({
           params,
         },
       }),
-      transformResponse: (response: Response<string[]>) =>
+      transformResponse: (response: Response) =>
         Array.from(new Set(response.result)),
     }),
   }),

@@ -1,6 +1,6 @@
-import { Item } from '../api/types.ts';
+import { Product } from '../types';
 
-export const uniqueItems = (array: Item[]) => {
+export const uniqueItems = (array: Product[]) => {
   const idSet = new Set();
   return array.filter((item) => {
     if (!idSet.has(item.id)) {

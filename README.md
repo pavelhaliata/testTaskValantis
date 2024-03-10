@@ -1,30 +1,37 @@
-# React + TypeScript + Vite
+# Test Task Valantis
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Описание проекта:
 
-Currently, two official plugins are available:
+Проект представляет собой веб-приложение, разработанное с использованием библиотеки React, TypeScript, библиотеки
+управления состоянием RTK Query для обработки запросов к API, и фреймворка Ant Design для стилизации и создания
+компонентов, а также инструментов ESLint и Prettier для обеспечения чистоты и структурированности кода.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Функциональность:
 
-## Expanding the ESLint configuration
+### Отображение списка товаров:
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Страница отображает список товаров, полученных из предоставленного API.
+- Каждый товар представлен следующей информацией: ID, название, цена и бренд.
 
-- Configure the top-level `parserOptions` property like this:
+### Пагинация:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
+- Реализована пагинация, позволяющая выводить по 50 товаров на страницу.
+- Пользователь может легко переключаться между страницами как вперед, так и назад.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Фильтрация:
+
+- Пользователь имеет возможность фильтровать результаты поиска по названию, цене и бренду.
+
+### Обработка дубликатов и ошибок:
+
+- Если API возвращает дубли по ID, только первый экземпляр будет отображен.
+- При возникновении ошибок при запросах, их идентификаторы выводятся в консоль, и запрос повторяется.
+
+### Технологии и библиотеки:
+
+- React: Использование React для построения пользовательского интерфейса.
+- TypeScript: Использование TypeScript для добавления статической типизации в код.
+- RTK Query: Интеграция RTK Query для управления состоянием и выполнения запросов к API.
+- Ant Design: Использование стилей и компонентов Ant Design для создания пользовательского интерфейса.
+- ESLint: Использование ESLint для обеспечения согласованности и стандартов кодирования.
+- Prettier: Применение Prettier для автоматического форматирования кода.
