@@ -39,9 +39,8 @@ export const baseApi = createApi({
           },
         },
       }),
-      transformResponse: (response: Response) => {
-        return Array.from(new Set(response.result));
-      },
+      transformResponse: (response: Response) =>
+        Array.from(new Set(response.result)),
     }),
     // получение списка товаров
     getItems: builder.mutation<Product[], { ids: string[] }>({
